@@ -87,7 +87,8 @@ async function init() {
     }
     if (quotes.length === 0) return console.error("No quotes loaded");
 
-    updateContent(quotes[0]);
+    currentIndex = Math.floor(Math.random() * quotes.length);
+    updateContent(quotes[currentIndex]);
     document.addEventListener("keydown", (event) => {
         if (event.code === "Space") handleContentChange();
     });
