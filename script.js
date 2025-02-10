@@ -61,12 +61,15 @@ async function handleContentChange() {
     main.classList.add('fade-out');
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    currentColorIndex = (currentColorIndex + 1) % colorSchemes.length;
+    const oldColorIndex = currentColorIndex;
+    while (oldColorIndex === currentColorIndex) { //ensure we don't pick the same color again
+        currentColorIndex = Math.floor(Math.random() * colorSchemes.length);
+    }
     const scheme = colorSchemes[currentColorIndex];
     document.documentElement.style.setProperty('--gradient-color1', scheme.color1);
     document.documentElement.style.setProperty('--gradient-color2', scheme.color2);
 
-    oldIndex = currentIndex;
+    const oldIndex = currentIndex;
     while (oldIndex === currentIndex) { //ensure we don't pick the same quote again
         currentIndex = Math.floor(Math.random() * quotes.length);
     }
@@ -87,7 +90,8 @@ async function init() {
     }
     if (quotes.length === 0) return console.error("No quotes loaded");
 
-    updateContent(quotes[0]);
+    currentIndex = Math.floor(Math.random() * quotes.length);
+    updateContent(quotes[currentIndex]);
     document.addEventListener("keydown", (event) => {
         if (event.code === "Space") handleContentChange();
     });
