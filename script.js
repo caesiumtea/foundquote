@@ -11,29 +11,6 @@ const colorSchemes = [
     { color1: 'rgba(147, 165, 207, 1)', color2: 'rgba(228, 239, 233, 1)' },
 ];
 
-// CSV parsing
-function parseCSV(csv) {
-    const [headers, ...lines] = csv.split('\n').filter(line => line.trim());
-    return lines.map(line => {
-        const values = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
-        return headers.split(',').reduce((obj, header, i) => {
-            obj[header.trim()] = values[i]?.replace(/^"|"$/g, '').replace(/""/g, '"').trim() || '';
-            return obj;
-        }, {});
-    }).filter(obj => Object.values(obj).some(val => val));
-}
-
-// Load CSV file
-async function loadCSV() {
-    try {
-        const response = await fetch("data.csv");
-        const csvData = await response.text();
-        return parseCSV(csvData);
-    } catch (error) {
-        console.error("Error loading CSV:", error);
-        return [];
-    }
-}
 
 // Update page content
 function updateContent(quote) {
