@@ -79,8 +79,12 @@ async function handleContentChange() {
 
 // Initialize application
 async function init() {
-    let quotesResponse = await fetch("data.json");
-    quotes = await quotesResponse.json();
+    try {
+        let quotesResponse = await fetch("data.json");
+        quotes = await quotesResponse.json();
+    } catch (error) {
+        console.error("Error reading JSON: ", error.message);
+    }
     if (quotes.length === 0) return console.error("No quotes loaded");
 
     updateContent(quotes[0]);
