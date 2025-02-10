@@ -11,29 +11,6 @@ const colorSchemes = [
     { color1: 'rgba(147, 165, 207, 1)', color2: 'rgba(228, 239, 233, 1)' },
 ];
 
-// CSV parsing
-function parseCSV(csv) {
-    const [headers, ...lines] = csv.split('\n').filter(line => line.trim());
-    return lines.map(line => {
-        const values = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
-        return headers.split(',').reduce((obj, header, i) => {
-            obj[header.trim()] = values[i]?.replace(/^"|"$/g, '').replace(/""/g, '"').trim() || '';
-            return obj;
-        }, {});
-    }).filter(obj => Object.values(obj).some(val => val));
-}
-
-// Load CSV file
-async function loadCSV() {
-    try {
-        const response = await fetch("data.csv");
-        const csvData = await response.text();
-        return parseCSV(csvData);
-    } catch (error) {
-        console.error("Error loading CSV:", error);
-        return [];
-    }
-}
 
 // Update page content
 function updateContent(quote) {
@@ -89,7 +66,10 @@ async function handleContentChange() {
     document.documentElement.style.setProperty('--gradient-color1', scheme.color1);
     document.documentElement.style.setProperty('--gradient-color2', scheme.color2);
 
-    currentIndex = (currentIndex + 1) % quotes.length;
+    oldIndex = currentIndex;
+    while (oldIndex === currentIndex) { //ensure we don't pick the same quote again
+        currentIndex = Math.floor(Math.random() * quotes.length);
+    }
     updateContent(quotes[currentIndex]);
 
     main.classList.remove('fade-out');
@@ -99,7 +79,12 @@ async function handleContentChange() {
 
 // Initialize application
 async function init() {
-    quotes = await loadCSV();
+    try {
+        let quotesResponse = await fetch("data.json");
+        quotes = await quotesResponse.json();
+    } catch (error) {
+        console.error("Error reading JSON: ", error.message);
+    }
     if (quotes.length === 0) return console.error("No quotes loaded");
 
     updateContent(quotes[0]);
