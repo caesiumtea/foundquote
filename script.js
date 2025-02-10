@@ -89,7 +89,10 @@ async function handleContentChange() {
     document.documentElement.style.setProperty('--gradient-color1', scheme.color1);
     document.documentElement.style.setProperty('--gradient-color2', scheme.color2);
 
-    currentIndex = (currentIndex + 1) % quotes.length;
+    oldIndex = currentIndex;
+    while (oldIndex === currentIndex) { //ensure we don't pick the same quote again
+        currentIndex = Math.floor(Math.random() * quotes.length);
+    }
     updateContent(quotes[currentIndex]);
 
     main.classList.remove('fade-out');
@@ -99,7 +102,8 @@ async function handleContentChange() {
 
 // Initialize application
 async function init() {
-    quotes = await loadCSV();
+    let quotesResponse = await fetch("data.json");
+    quotes = await quotesResponse.json();
     if (quotes.length === 0) return console.error("No quotes loaded");
 
     updateContent(quotes[0]);
